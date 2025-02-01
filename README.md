@@ -1,4 +1,4 @@
-# Projeto LED Matrix
+# Projeto LED Matrix e Led RGB
 
 Este projeto implementa um contador digital usando a placa BitDogLab com o microcontrolador RP2040, demonstrando o uso de interrupções, debouncing de botões e controle de LEDs.
 
@@ -24,24 +24,29 @@ Este projeto implementa um contador digital usando a placa BitDogLab com o micro
 
 ## Como Compilar
 
-1. Configure a variável de ambiente PICO_SDK_PATH apontando para o diretório do SDK:
+1. Clone o repositório:
+```bash
+git clone [https://github.com/SuianiAlmeida/Tarefa27Jan.git]
+```
+
+2. Configure a variável de ambiente PICO_SDK_PATH apontando para o diretório do SDK:
 ```bash
 export PICO_SDK_PATH=/caminho/para/pico-sdk
 ```
 
-2. Crie e entre no diretório de build:
+3. Crie e entre no diretório de build:
 ```bash
 mkdir build
 cd build
 ```
 
-3. Execute o CMake e compile:
+4. Execute o CMake e compile:
 ```bash
 cmake ..
 make
 ```
 
-4. O arquivo .uf2 será gerado em build/led_matrix_interrupt.uf2
+5. O arquivo .uf2 será gerado em build/led_matrix_interrupt.uf2
 
 ## Características Técnicas
 
