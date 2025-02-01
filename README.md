@@ -9,3 +9,17 @@ Este projeto implementa um contador digital usando a placa BitDogLab com o micro
 3. Botão B (GPIO 6) decrementa o número exibido
 4. Matriz de LEDs WS2812 5x5 exibindo números de 0 a 9
 
+## Componentes Utilizados
+
+- Matriz 5x5 de LEDs WS2812 (GPIO 7)
+- LED RGB (GPIOs 11, 12, 13)
+- Botão A (GPIO 5)
+- Botão B (GPIO 6)
+
+## Requisitos de Software
+
+- Raspberry Pi Pico SDK
+- CMake
+- Compilador GCC para ARM
+
+## Como Compilar
