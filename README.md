@@ -9,6 +9,10 @@ Este projeto implementa um contador digital usando a placa BitDogLab com o micro
 3. Botão B (GPIO 6) decrementa o número exibido
 4. Matriz de LEDs WS2812 5x5 exibindo números de 0 a 9
 
+## Demonstração por Vídeo
+
+- Video de apresentação e funcionamento dos leds na placa BitDogLab [https://youtu.be/EHDwrLAOUGk?feature=shared]
+
 ## Componentes Utilizados
 
 - Matriz 5x5 de LEDs WS2812 (GPIO 7)
