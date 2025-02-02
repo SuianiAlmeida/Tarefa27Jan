@@ -116,3 +116,106 @@ const bool number_patterns[10][MATRIX_HEIGHT][MATRIX_WIDTH] = {
         {1, 1, 1, 1, 1}
     }
 };
+
+// Function prototypes
+void gpio_callback(uint gpio, uint32_t events);
+void update_led_matrix(int number);
+void init_led_matrix(void);
+void set_led_pixel(int x, int y, uint32_t color);
+
+// Button interrupt callback
+void gpio_callback(uint gpio, uint32_t events) {
+    uint32_t current_time = to_ms_since_boot(get_absolute_time());
+    
+    if (gpio == BUTTON_A_PIN) {
+        if (current_time - last_button_a_time >= DEBOUNCE_DELAY_MS) {
+            if (current_number < 9) {
+                current_number++;
+                button_a_pressed = true;
+            }
+            last_button_a_time = current_time;
+        }
+    } else if (gpio == BUTTON_B_PIN) {
+        if (current_time - last_button_b_time >= DEBOUNCE_DELAY_MS) {
+            if (current_number > 0) {
+                current_number--;
+                button_b_pressed = true;
+            }
+            last_button_b_time = current_time;
+        }
+    }
+}
+
+// Initialize LED matrix
+void init_led_matrix(void) {
+    PIO pio = PIO_INSTANCE;
+    int sm = SM;
+    uint offset = pio_add_program(pio, &ws2812_program);
+    ws2812_program_init(pio, sm, offset, LED_MATRIX_PIN, 800000, false);
+}
+
+// Set individual LED in the matrix
+void set_led_pixel(int x, int y, uint32_t color) {
+    int index = y * MATRIX_WIDTH + x;  // Mapeia a posição para um índice
+    uint32_t rgb = ((color & 0xFF0000) >> 8) | ((color & 0x00FF00) << 8) | ((color & 0x0000FF) << 16);
+    pio_sm_put_blocking(PIO_INSTANCE, SM, rgb << 8u);  // WS2812 usa GRB, não RGB
+}
+
+// Update LED matrix display
+void update_led_matrix(int number) {
+    if (number < 0 || number > 9) return;
+    
+    for (int y = 0; y < MATRIX_HEIGHT; y++) {
+        for (int x = 0; x < MATRIX_WIDTH; x++) {
+            if (number_patterns[number][y][x]) {
+                set_led_pixel(x, y, 0x00FF00); // Verde
+            } else {
+                set_led_pixel(x, y, 0x000000); // Desligado
+            }
+        }
+    }
+}
+
+// Apaga todos os LEDs da matriz ao iniciar
+void clear_led_matrix() {
+    for (int y = 0; y < MATRIX_HEIGHT; y++) {
+        for (int x = 0; x < MATRIX_WIDTH; x++) {
+            set_led_pixel(x, y, 0x000000); // Apaga todos os LEDs
+        }
+    }
+}
+
+int main() {
+    stdio_init_all();
+
+    gpio_init(LED_RED_PIN);
+    gpio_set_dir(LED_RED_PIN, GPIO_OUT);
+    
+    gpio_init(BUTTON_A_PIN);
+    gpio_init(BUTTON_B_PIN);
+    gpio_set_dir(BUTTON_A_PIN, GPIO_IN);
+    gpio_set_dir(BUTTON_B_PIN, GPIO_IN);
+    gpio_pull_up(BUTTON_A_PIN);
+    gpio_pull_up(BUTTON_B_PIN);
+
+    gpio_set_irq_enabled_with_callback(BUTTON_A_PIN, GPIO_IRQ_EDGE_FALL, true, &gpio_callback);
+    gpio_set_irq_enabled_with_callback(BUTTON_B_PIN, GPIO_IRQ_EDGE_FALL, true, &gpio_callback);
+
+    init_led_matrix();
+    clear_led_matrix();  // Chama a função para apagar a matriz antes de iniciar
+
+    while (1) {
+        gpio_put(LED_RED_PIN, 1);
+        sleep_ms(100);
+        gpio_put(LED_RED_PIN, 0);
+        sleep_ms(100);
+
+        if (button_a_pressed || button_b_pressed) {
+            update_led_matrix(current_number);
+            button_a_pressed = false;
+            button_b_pressed = false;
+        }
+    }
+
+    return 0;
+}
